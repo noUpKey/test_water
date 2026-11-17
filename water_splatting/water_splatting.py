@@ -210,8 +210,9 @@ class WaterSplattingModelConfig(ModelConfig):
     """Path to Difix3D/src containing pipeline_difix.py (or set the DIFIX_SRC environment variable)."""
     pseudo_fixer_fp16: bool = True
     """Run the fixer in float16 (needed to fit a T4 comfortably)."""
-    pseudo_fixer_max_side: int = 1024
-    """The fixer runs at most at this resolution (long side); outputs are resized back."""
+    pseudo_fixer_max_side: int = 768
+    """The fixer runs at most at this resolution (long side); outputs are resized back. It shares the GPU with the
+    Gaussians, so on out-of-memory it automatically retries smaller (see DifixFixer)."""
     pseudo_color_match: bool = True
     """Match the per-channel mean/std of the fixer output to its input (guards against global colour drift)."""
     pseudo_detach_medium: bool = True

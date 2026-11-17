@@ -148,6 +148,38 @@ def test_effective_attenuation_bounds():
     assert A.min() >= 0 and A.max() <= 1
 
 
+class _FakePipe:
+    """Stands in for DifixPipeline: raises CUDA OOM above `limit` pixels, otherwise returns the input image + 0.1."""
+
+    def __init__(self, limit):
+        self.limit, self.sizes = limit, []
+
+    def to(self, device):
+        return self
+
+    def __call__(self, prompt, image, height, width, **kw):
+        import numpy as np
+        from PIL import Image
+        self.sizes.append((height, width))
+        if height * width > self.limit:
+            raise torch.cuda.OutOfMemoryError("fake OOM")
+        arr = np.clip(np.asarray(image, dtype=np.float32) + 25.5, 0, 255).astype(np.uint8)
+        return type("Out", (), {"images": [Image.fromarray(arr)]})()
+
+
+def test_difix_oom_retries_smaller_then_falls_back():
+    img = torch.full((600, 900, 3), 0.5)
+    # fits after one downscale (768 -> 576 long side)
+    f = pv.DifixFixer(device="cpu", max_side=768); f.pipe = _FakePipe(limit=576 * 384)
+    out = f([img], [None])[0]
+    assert f.pipe.sizes[0][1] == 768 and f.pipe.sizes[-1][1] == 576, f.pipe.sizes
+    assert out.shape == img.shape and torch.allclose(out, torch.full_like(img, 0.6), atol=0.01)
+    # never fits -> returned unchanged, no exception
+    f = pv.DifixFixer(device="cpu", max_side=768); f.pipe = _FakePipe(limit=0)
+    out = f([img], [None])[0]
+    assert torch.equal(out, img) and min(w for _, w in f.pipe.sizes) >= 384
+
+
 if __name__ == "__main__":
     fns = [v for k, v in sorted(globals().items()) if k.startswith("test_") and callable(v)]
     for fn in fns:

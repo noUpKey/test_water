@@ -352,7 +352,7 @@ class DifixFixer:
         use_reference: bool = True,
         difix_src: str = "",
         fp16: bool = True,
-        max_side: int = 1024,
+        max_side: int = 768,
         prompt: str = "remove degradation",
         timestep: int = 199,
         device: str = "cuda",
@@ -395,10 +395,6 @@ class DifixFixer:
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
 
-    def _target_size(self, h: int, w: int) -> Tuple[int, int]:
-        s = min(1.0, self.max_side / max(h, w))
-        return max(8, int(round(h * s / 8)) * 8), max(8, int(round(w * s / 8)) * 8)
-
     @staticmethod
     def _to_pil(img: Tensor, h: int, w: int):
         from PIL import Image
@@ -406,38 +402,66 @@ class DifixFixer:
         arr = (resize_hw(img.float().cpu(), h, w).clamp(0, 1) * 255.0 + 0.5).to(torch.uint8).numpy()
         return Image.fromarray(arr)
 
-    @torch.no_grad()
-    def __call__(self, images: Sequence[Tensor], refs: Optional[Sequence[Optional[Tensor]]] = None) -> List[Tensor]:
+    def _fix_one(self, img: Tensor, ref: Optional[Tensor], max_side: int) -> Tensor:
         import numpy as np
 
+        H, W = img.shape[:2]
+        s = min(1.0, max_side / max(H, W))
+        h, w = max(8, int(round(H * s / 8)) * 8), max(8, int(round(W * s / 8)) * 8)
+        call = dict(
+            prompt=self.prompt,
+            image=self._to_pil(img, h, w),
+            height=h,
+            width=w,
+            num_inference_steps=1,
+            timesteps=[self.timestep],
+            guidance_scale=0.0,
+        )
+        if ref is not None:
+            call["ref_image"] = self._to_pil(ref, h, w)
+        pil = self.pipe(**call).images[0]
+        out = torch.from_numpy(np.asarray(pil.convert("RGB"), dtype=np.float32) / 255.0)
+        return resize_hw(out, H, W).to(img.device, img.dtype)
+
+    @torch.no_grad()
+    def __call__(self, images: Sequence[Tensor], refs: Optional[Sequence[Optional[Tensor]]] = None) -> List[Tensor]:
+        """Fixes every image. The fixer shares the GPU with the Gaussians being trained, so on CUDA out-of-memory it
+        frees the cache and retries at a smaller resolution (x0.75 down to 384 px); if that still fails the image is
+        returned unchanged (its pseudo-target then equals the current render). Training is never interrupted."""
         self._load()
-        self.pipe.to(self.device)
-        outs = []
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()  # release memory cached by the training renders before loading the fixer
+        try:
+            self.pipe.to(self.device)
+        except torch.cuda.OutOfMemoryError:
+            self.offload()
+            print(f"[MDGR] fixer could not be moved to {self.device} (out of memory): pseudo-views left unfixed this round")
+            return [img.clone() for img in images]
+        outs, n_retry, n_skip = [], 0, 0
         try:
             for k, img in enumerate(images):
-                H, W = img.shape[:2]
-                h, w = self._target_size(H, W)
-                call = dict(
-                    prompt=self.prompt,
-                    image=self._to_pil(img, h, w),
-                    height=h,
-                    width=w,
-                    num_inference_steps=1,
-                    timesteps=[self.timestep],
-                    guidance_scale=0.0,
-                )
                 ref = refs[k] if (refs is not None and self.uses_reference) else None
-                if ref is not None:
-                    call["ref_image"] = self._to_pil(ref, h, w)
-                pil = self.pipe(**call).images[0]
-                out = torch.from_numpy(np.asarray(pil.convert("RGB"), dtype=np.float32) / 255.0)
-                outs.append(resize_hw(out, H, W).to(img.device, img.dtype))
+                side, out = self.max_side, None
+                while out is None:
+                    try:
+                        out = self._fix_one(img, ref, side)
+                    except torch.cuda.OutOfMemoryError:
+                        torch.cuda.empty_cache()
+                        side = int(side * 0.75)
+                        if side < 384:
+                            out = img.clone()
+                            n_skip += 1
+                        else:
+                            n_retry += 1
+                outs.append(out)
         finally:
             self.offload()
+        if n_retry or n_skip:
+            print(f"[MDGR] fixer out of memory: {n_retry} retries at lower resolution, {n_skip}/{len(images)} views left unfixed")
         return outs
 
 
-def make_fixer(name: str, model_id: str = "", difix_src: str = "", fp16: bool = True, max_side: int = 1024):
+def make_fixer(name: str, model_id: str = "", difix_src: str = "", fp16: bool = True, max_side: int = 768):
     if name == "identity":
         return IdentityFixer()
     if name in ("difix", "difix_ref"):
