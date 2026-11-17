@@ -1,0 +1,575 @@
+Using Cached Shard Index for conda-forge/linux-64                                                   ✔ Done
+Using Cached Shard Index for conda-forge/noarch                                                     ✔ Done
+Fetching and Parsing Packages' Shards                                                           ⧖ Starting
+Fetching and Parsing Packages' Shards                                                     ✔ Done (2.9 sec)
+
+Resolving Environment                                                                           ⧖ Starting
+Resolving Environment                                                                     ✔ Done (4.9 sec)
+
+Transaction
+
+  Prefix: /opt/colmap_env
+
+  Updating specs:
+
+   - colmap
+
+
+  Package                                      Version  Build                     Channel           Size
+──────────────────────────────────────────────────────────────────────────────────────────────────────────
+  Install:
+──────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  + _openmp_mutex                                  4.5  20_gnu                    conda-forge     Cached
+  + _x86_64-microarch-level                          4  3_x86_64_v4               conda-forge       10kB
+  + alsa-lib                                  1.2.16.1  h7cc23a3_1                conda-forge      595kB
+  + aom                                         3.15.3  pl5321h57e6904_0          conda-forge        3MB
+  + aws-c-auth                                   1.0.2  h2824ed8_1                conda-forge      136kB
+  + aws-c-cal                                    1.0.0  hcf7459e_1                conda-forge       59kB
+  + aws-c-common                                 1.0.5  hebe6cf0_0                conda-forge      279kB
+  + aws-c-compression                            1.0.0  ha404f16_1                conda-forge       22kB
+  + aws-c-http                                   1.0.0  hb7dfbc4_2                conda-forge      233kB
+  + aws-c-io                                     1.1.2  he71e18f_1                conda-forge      215kB
+  + aws-c-s3                                     1.3.1  hf63ef51_1                conda-forge      175kB
+  + aws-c-sdkutils                               1.0.1  ha404f16_0                conda-forge       72kB
+  + aws-checksums                                1.0.1  ha404f16_1                conda-forge      106kB
+  + bzip2                                        1.0.8  hda65f42_10               conda-forge     Cached
+  + c-ares                                      1.34.9  hebe6cf0_0                conda-forge     Cached
+  + ca-certificates                         2026.10.23  hbd8a1cb_0                conda-forge     Cached
+  + cairo                                       1.18.6  h3c89d7e_0                conda-forge        1MB
+  + ceres-solver                                 2.2.0  gpugplh1a3d155_311        conda-forge        2MB
+  + colmap                                       4.2.1  cuda_129gpl_h960d87c_408  conda-forge      141MB
+  + cuda-cudart                                12.9.79  h5888daf_0                conda-forge       23kB
+  + cuda-cudart_linux-64                       12.9.79  h3f2d84a_0                conda-forge      197kB
+  + cuda-nvrtc                                 12.9.86  hecca717_1                conda-forge       67MB
+  + cuda-version                                  12.9  h4f385c5_3                conda-forge       22kB
+  + cyrus-sasl                                  2.1.28  hac629b4_1                conda-forge      210kB
+  + dbus                                        1.16.2  he8c428d_2                conda-forge      450kB
+  + dcmtk                                        3.7.0  h43deee3_0                conda-forge       10MB
+  + double-conversion                            3.4.0  hecca717_0                conda-forge       72kB
+  + eigen                                        5.0.1  h19c2612_3                conda-forge        1MB
+  + eigen-abi                                 5.0.1.80  hf414acd_3                conda-forge       13kB
+  + ffmpeg                                       9.0.2  gpl_hac98dcb_908          conda-forge       14MB
+  + flann                                        1.9.2  h2239a5b_7                conda-forge        2MB
+  + font-ttf-dejavu-sans-mono                     2.37  hab24e00_0                conda-forge      397kB
+  + font-ttf-inconsolata                         3.000  h77eed37_0                conda-forge       97kB
+  + font-ttf-source-code-pro                     2.038  h77eed37_0                conda-forge      701kB
+  + font-ttf-ubuntu                               0.83  h77eed37_4                conda-forge        2MB
+  + fontconfig                                  2.18.3  h4db4eae_2                conda-forge      297kB
+  + fonts-conda-ecosystem                            1  0                         conda-forge        4kB
+  + fonts-conda-forge                                1  hc364b38_1                conda-forge        4kB
+  + freeglut                                     3.2.2  h215f996_4                conda-forge      146kB
+  + freeimage                                   3.18.0  h3038e8d_27               conda-forge      473kB
+  + freetype                                    2.14.3  ha770c72_2                conda-forge      175kB
+  + fribidi                                     1.0.18  h7cc23a3_0                conda-forge       65kB
+  + gdk-pixbuf                                  2.44.8  h68053f1_2                conda-forge      582kB
+  + gflags                                       2.3.1  hee9eb32_0                conda-forge      137kB
+  + giflib                                       6.1.3  hebe6cf0_2                conda-forge       86kB
+  + glew                                         2.3.0  h71661d4_0                conda-forge      493kB
+  + glog                                         0.7.1  hb7133d2_1                conda-forge      149kB
+  + glslang                                     16.6.0  h980caa0_0                conda-forge        1MB
+  + gmp                                          6.3.0  hfd2156b_3                conda-forge      493kB
+  + graphite2                                   1.3.15  h54a6638_1                conda-forge      103kB
+  + hdf5                                         2.2.0  nompi_h35f8cf1_102        conda-forge        5MB
+  + icu                                           78.3  py310h44b86e0_2           conda-forge       14MB
+  + imath                                        3.2.3  h923cf36_1                conda-forge      163kB
+  + intel-gmmlib                               22.10.2  h7148c6a_0                conda-forge        1MB
+  + intel-media-driver                          26.1.6  hecca717_0                conda-forge        9MB
+  + jasper                                       4.2.9  hd038ad9_2                conda-forge      724kB
+  + jxrlib                                         1.1  hd590300_3                conda-forge      239kB
+  + keyutils                                     1.6.3  h7cc23a3_1                conda-forge     Cached
+  + krb5                                        1.22.2  hbc21106_2                conda-forge     Cached
+  + lame                                           4.0  h770b6ad_1                conda-forge      304kB
+  + lcms2                                         2.20  h9073bf1_0                conda-forge      255kB
+  + ld_impl_linux-64                            2.46.1  default_hbd61a6d_103      conda-forge     Cached
+  + lerc                                         4.3.0  he78707d_0                conda-forge      270kB
+  + level-zero                                  1.34.0  h7148c6a_0                conda-forge      794kB
+  + libabseil                               20260817.0  cxx17_hbb87c76_2          conda-forge        1MB
+  + libaec                                       1.1.8  h659bb9a_0                conda-forge       38kB
+  + libamd                                       3.3.3  haaf9dc3_7100102          conda-forge       50kB
+  + libass                                      0.17.5  h3b6f6bf_1                conda-forge      155kB
+  + libavif16                                    1.4.2  h0563ae5_6                conda-forge      168kB
+  + libblas                                     3.11.0  12_h4a7cf45_openblas      conda-forge       18kB
+  + libboost                                    1.90.0  h1101c1b_3                conda-forge        3MB
+  + libbrotlicommon                              1.2.1  h39a168f_1                conda-forge       81kB
+  + libbrotlidec                                 1.2.1  ha411449_1                conda-forge       35kB
+  + libbrotlienc                                 1.2.1  h018ffa1_1                conda-forge      298kB
+  + libbtf                                       2.3.2  h32481e8_7100102          conda-forge       28kB
+  + libcamd                                      3.3.3  h32481e8_7100102          conda-forge       47kB
+  + libcap                                        2.78  h084b8d7_1                conda-forge      124kB
+  + libcblas                                    3.11.0  12_h0358290_openblas      conda-forge       18kB
+  + libccolamd                                   3.3.4  h32481e8_7100102          conda-forge       43kB
+  + libcholmod                                   5.3.1  h59ddab4_7100102          conda-forge        1MB
+  + libcolamd                                    3.3.4  h32481e8_7100102          conda-forge       34kB
+  + libcublas                                12.9.2.10  h676940d_0                conda-forge      468MB
+  + libcups                                      2.3.3  h7a8fb5f_6                conda-forge        5MB
+  + libcurand                               10.3.10.19  h676940d_1                conda-forge       46MB
+  + libcurl                                     8.23.0  ha042cf0_0                conda-forge     Cached
+  + libcusolver                              11.7.5.82  h676940d_2                conda-forge      205MB
+  + libcusparse                             12.5.10.65  hecca717_2                conda-forge      209MB
+  + libcxsparse                                  4.4.1  h32481e8_7100102          conda-forge      121kB
+  + libdav1d7                                    1.5.4  hebe6cf0_4                conda-forge      765kB
+  + libde265                                     1.1.3  h4dbf13b_1                conda-forge      423kB
+  + libdeflate                                    1.26  h351257e_0                conda-forge       74kB
+  + libdovi                                      3.4.0  h39d0f39_1                conda-forge      405kB
+  + libdrm                                     2.4.129  h7cc23a3_0                conda-forge      313kB
+  + libedit                               3.1.20260512  pl5321h373387f_0          conda-forge     Cached
+  + libegl                                       1.7.0  ha4b6fd6_5                conda-forge       47kB
+  + libegl-devel                                 1.7.0  ha4b6fd6_5                conda-forge       31kB
+  + libev                                         4.33  h280c20c_3                conda-forge     Cached
+  + libexpat                                     2.9.0  hd2095e1_0                conda-forge     Cached
+  + libfaiss                                    1.14.3  cuda129h26894d9_501_cuda  conda-forge       96MB
+  + libffi                                       3.7.0  h81df57d_1                conda-forge     Cached
+  + libflac                                      1.5.0  he200343_1                conda-forge      425kB
+  + libfreetype                                 2.14.3  ha770c72_2                conda-forge        8kB
+  + libfreetype6                                2.14.3  h5e6c136_2                conda-forge      388kB
+  + libgcc                                      16.2.0  ha9f2e26_7                conda-forge     Cached
+  + libgcc-ng                                   16.2.0  h69a702a_7                conda-forge     Cached
+  + libgfortran                                 16.2.0  h69a702a_7                conda-forge       29kB
+  + libgfortran5                                16.2.0  h6b99dfc_7                conda-forge        3MB
+  + libgl                                        1.7.0  ha4b6fd6_5                conda-forge      132kB
+  + libgl-devel                                  1.7.0  ha4b6fd6_5                conda-forge      116kB
+  + libglib                                     2.90.1  hb382ddc_3                conda-forge        5MB
+  + libglu                                       9.0.3  h5888daf_1                conda-forge      325kB
+  + libglvnd                                     1.7.0  ha4b6fd6_5                conda-forge      134kB
+  + libglx                                       1.7.0  ha4b6fd6_5                conda-forge       80kB
+  + libglx-devel                                 1.7.0  ha4b6fd6_5                conda-forge       28kB
+  + libgomp                                     16.2.0  he0feb66_7                conda-forge     Cached
+  + libharfbuzz                                 15.0.0  h23af247_0                conda-forge        2MB
+  + libharfbuzz-devel                           15.0.0  h23af247_0                conda-forge        2MB
+  + libheif                                     1.23.7  gpl_h002e341_103          conda-forge        1MB
+  + libhwloc                                    2.15.0  default_hd7c4d0c_1001     conda-forge        2MB
+  + libhwy                                       1.4.0  h57c4cff_2                conda-forge        1MB
+  + libiconv                                      1.18  h0cb94f2_3                conda-forge     Cached
+  + libjpeg-turbo                                3.2.1  h7cc23a3_0                conda-forge      654kB
+  + libjxl                                      0.13.0  heb2dce7_0                conda-forge        2MB
+  + libklu                                       2.3.5  hf24d653_7100102          conda-forge      146kB
+  + liblapack                                   3.11.0  12_h47877c9_openblas      conda-forge       18kB
+  + libldl                                       3.3.2  h32481e8_7100102          conda-forge       24kB
+  + liblzma                                      5.8.3  hb03c661_1                conda-forge     Cached
+  + libmpdec                                     4.0.0  hb03c661_2                conda-forge       93kB
+  + libnghttp2                                  1.71.0  hc5e5977_0                conda-forge     Cached
+  + libntlm                                        1.8  hebe6cf0_2                conda-forge       34kB
+  + libnvjitlink                               12.9.86  hecca717_2                conda-forge       31MB
+  + libogg                                       1.3.5  hd0c01bc_1                conda-forge      218kB
+  + libopenblas                                 0.3.34  pthreads_hf13c14d_2       conda-forge        7MB
+  + libopencolorio                               2.6.0  h59f12a5_7                conda-forge        2MB
+  + libopengl                                    1.7.0  ha4b6fd6_5                conda-forge       51kB
+  + libopenimageio                             3.2.2.0  h8915cf7_2                conda-forge        4MB
+  + libopenvino                               2026.4.1  hab39aeb_2                conda-forge        7MB
+  + libopenvino-auto-batch-plugin             2026.4.1  h7c4c8b8_2                conda-forge      117kB
+  + libopenvino-auto-plugin                   2026.4.1  h7c4c8b8_2                conda-forge      278kB
+  + libopenvino-gguf-frontend                 2026.4.1  h7c4c8b8_2                conda-forge      678kB
+  + libopenvino-hetero-plugin                 2026.4.1  he798987_2                conda-forge      246kB
+  + libopenvino-intel-cpu-plugin              2026.4.1  hab39aeb_2                conda-forge       14MB
+  + libopenvino-intel-gpu-plugin              2026.4.1  hab39aeb_2                conda-forge       12MB
+  + libopenvino-intel-npu-plugin              2026.4.1  hab39aeb_2                conda-forge        3MB
+  + libopenvino-ir-frontend                   2026.4.1  he798987_2                conda-forge      224kB
+  + libopenvino-onnx-frontend                 2026.4.1  hff0d05b_2                conda-forge        2MB
+  + libopenvino-paddle-frontend               2026.4.1  hff0d05b_2                conda-forge      693kB
+  + libopenvino-pytorch-frontend              2026.4.1  h90c3318_2                conda-forge        1MB
+  + libopenvino-tensorflow-frontend           2026.4.1  hf340240_2                conda-forge        1MB
+  + libopenvino-tensorflow-lite-frontend      2026.4.1  h90c3318_2                conda-forge      514kB
+  + libopus                                      1.6.1  hebe6cf0_1                conda-forge      330kB
+  + libpango                                    1.58.2  hce4e988_3                conda-forge      344kB
+  + libpango-devel                              1.58.2  h317d9d0_3                conda-forge      211kB
+  + libparu                                      1.0.0  h17147ab_7100102          conda-forge       93kB
+  + libpciaccess                                  0.19  hb03c661_1                conda-forge       30kB
+  + libplacebo                                 7.387.0  h9669efe_0                conda-forge      604kB
+  + libpng                                      1.6.59  h922cc85_0                conda-forge      317kB
+  + libpq                                         18.7  h3883810_0                conda-forge        3MB
+  + libprotobuf                                 7.35.1  h8a00109_4                conda-forge        4MB
+  + libpsl                                      0.23.1  hd9e3e90_1                conda-forge       73kB
+  + libraw                                      0.22.3  hab3bfc1_0                conda-forge      751kB
+  + librbio                                      4.3.4  h32481e8_7100102          conda-forge       48kB
+  + libre2-11                               2025.11.05  h02ca46f_4                conda-forge      211kB
+  + librsvg                                     2.62.4  ha427ee3_0                conda-forge        5MB
+  + libsndfile                                   1.2.2  hbc6d301_3                conda-forge      388kB
+  + libspex                                      3.2.3  had10066_7100102          conda-forge       81kB
+  + libspqr                                      4.3.4  h852d39f_7100102          conda-forge      218kB
+  + libsqlite                                   3.54.1  h13e7031_0                conda-forge      984kB
+  + libssh2                                     1.11.1  h6154650_1                conda-forge     Cached
+  + libstdcxx                                   16.2.0  h934c35e_7                conda-forge     Cached
+  + libsuitesparseconfig                        7.10.1  h92d6892_7100102          conda-forge       43kB
+  + libsystemd0                                  262.2  h26e0ef7_1                conda-forge      575kB
+  + libtiff                                      4.7.2  h6d37cbf_2                conda-forge      460kB
+  + libudev1                                     262.2  h26e0ef7_1                conda-forge      186kB
+  + libultrahdr                                  2.0.2  h6f1b2e9_0                conda-forge      400kB
+  + libumfpack                                   6.3.5  heb53515_7100102          conda-forge      434kB
+  + libunwind                                    1.8.3  hd2e8b67_1                conda-forge       78kB
+  + liburing                                      2.15  h4dbf13b_0                conda-forge      167kB
+  + libusb                                      1.0.30  h0d1bbbc_1                conda-forge       91kB
+  + libuuid                                     2.42.4  hcfc3c73_1                conda-forge     Cached
+  + libva                                       2.24.1  hb83e432_1                conda-forge      225kB
+  + libvorbis                                    1.3.7  h54a6638_2                conda-forge      286kB
+  + libvpl                                      2.16.0  h54a6638_0                conda-forge      288kB
+  + libvpx                                      1.17.0  hd2095e1_0                conda-forge        1MB
+  + libvulkan-loader                         1.4.357.0  h0e34353_2                conda-forge      207kB
+  + libwebp-base                                 1.6.0  hd42ef1d_1                conda-forge      428kB
+  + libxcb                                      1.17.0  hb83e432_3                conda-forge      399kB
+  + libxcrypt                                   4.4.38  h280c20c_0                conda-forge     Cached
+  + libxkbcommon                                1.13.2  h59c2f34_2                conda-forge      945kB
+  + libxml2                                     2.15.4  h7df9aa5_1                conda-forge       47kB
+  + libxml2-16                                  2.15.4  hf3af7cc_1                conda-forge      569kB
+  + libzlib                                      1.3.2  h25fd6f3_3                conda-forge     Cached
+  + lz4-c                                       1.11.1  hee9eb32_0                conda-forge      237kB
+  + metis                                        5.1.0  h86e3903_1008             conda-forge        4MB
+  + minizip                                      4.2.2  haac24f3_1                conda-forge      567kB
+  + mpfr                                         4.2.2  ha2cb11d_1                conda-forge      730kB
+  + mpg123                                      1.33.7  h877a99e_1                conda-forge      491kB
+  + ncurses                                        6.6  hdb14827_1                conda-forge     Cached
+  + numpy                                        2.5.5  py315h50affdf_1           conda-forge        9MB
+  + ocl-icd                                      2.3.4  hb03c661_1                conda-forge      110kB
+  + onnxruntime-cpp                             1.32.0  h49c692b_0_cpu            conda-forge       10MB
+  + opencl-headers                          2025.06.13  hecca717_0                conda-forge       56kB
+  + openexr                                      3.5.4  h6fc6928_0                conda-forge        1MB
+  + openh264                                     2.7.0  h8c49934_0                conda-forge      734kB
+  + openjpeg                                     2.5.4  heb1ab33_2                conda-forge      391kB
+  + openjph                                     0.33.0  h2a08dbc_0                conda-forge      312kB
+  + openldap                                    2.6.13  hbde042b_0                conda-forge      786kB
+  + openssl                                      3.6.5  h781a0a9_0                conda-forge     Cached
+  + pango                                       1.58.2  h2f58602_3                conda-forge       15kB
+  + pcre2                                        10.49  h8b3dc9c_0                conda-forge     Cached
+  + pixman                                      0.46.4  h54a6638_3                conda-forge      377kB
+  + poselib                                      2.0.5  np2py315h515ddb1_1        conda-forge        2MB
+  + pthread-stubs                                  0.4  h7cc23a3_1004             conda-forge       10kB
+  + pugixml                                       1.15  h3f63f65_0                conda-forge      118kB
+  + pulseaudio-client                             17.0  hb10c1b2_4                conda-forge      755kB
+  + pystring                                     1.2.0  h171cf75_0                conda-forge       55kB
+  + python                                      3.15.2  h6e52b48_100_cp315        conda-forge       29MB
+  + python_abi                                    3.15  9_cp315                   conda-forge        7kB
+  + qt6-main                                    6.12.0  pl5321hb5a8836_2          conda-forge       65MB
+  + rav1e                                        0.8.1  hbab41bb_1                conda-forge        5MB
+  + re2                                     2025.11.05  hbf548d4_4                conda-forge       28kB
+  + s2n                                         1.7.13  h6b754c5_0                conda-forge      387kB
+  + sdl2                                       2.32.56  hee9eb32_1                conda-forge      584kB
+  + sdl3                                        3.4.20  h8e1bbd5_2                conda-forge        2MB
+  + shaderc                                     2026.4  hcebf71c_1                conda-forge      114kB
+  + snappy                                       1.3.1  h7edda9a_1                conda-forge       48kB
+  + spirv-tools                                 2026.4  h7148c6a_2                conda-forge        2MB
+  + suitesparse                                 7.10.1  ha0f6916_7100102          conda-forge       12kB
+  + svt-av1                                      4.3.0  hd2095e1_0                conda-forge        3MB
+  + tbb                                       2023.1.0  haa8c3ee_4                conda-forge      187kB
+  + tk                                          8.6.13  noxft_h1df4ec4_4          conda-forge     Cached
+  + tzdata                                       2026e  h5d301ff_0                conda-forge     Cached
+  + vlfeat                                      0.9.21  hd590300_1                conda-forge      236kB
+  + wayland                                     1.26.0  hc1c935e_2                conda-forge      340kB
+  + wayland-protocols                             1.50  hd8ed1ab_0                conda-forge      150kB
+  + x264                                    1!164.3095  pl5321h63c0a64_3          conda-forge      782kB
+  + x265                                           3.5  h73f68a7_4                conda-forge        2MB
+  + xcb-util                                     0.4.1  h4f16b4b_2                conda-forge       21kB
+  + xcb-util-cursor                              0.1.6  hb03c661_0                conda-forge       21kB
+  + xcb-util-image                               0.4.0  hb711507_2                conda-forge       25kB
+  + xcb-util-keysyms                             0.4.1  hb711507_0                conda-forge       14kB
+  + xcb-util-renderutil                         0.3.10  hb711507_0                conda-forge       17kB
+  + xcb-util-wm                                  0.4.2  hb711507_0                conda-forge       52kB
+  + xkeyboard-config                              2.48  hebe6cf0_1                conda-forge      442kB
+  + xorg-libice                                  1.1.2  h280c20c_0                conda-forge       63kB
+  + xorg-libsm                                   1.2.6  h0d788c3_1                conda-forge       31kB
+  + xorg-libx11                                 1.8.14  hb83e432_0                conda-forge      847kB
+  + xorg-libxau                                 1.0.12  h7cc23a3_2                conda-forge       19kB
+  + xorg-libxcomposite                           0.4.7  hb03c661_0                conda-forge       14kB
+  + xorg-libxcursor                              1.2.3  h7cc23a3_1                conda-forge       35kB
+  + xorg-libxdamage                              1.1.6  hb9d3cd8_0                conda-forge       13kB
+  + xorg-libxdmcp                                1.1.5  h7cc23a3_2                conda-forge       23kB
+  + xorg-libxext                                 1.3.7  h7cc23a3_1                conda-forge       53kB
+  + xorg-libxfixes                               6.0.2  h7cc23a3_1                conda-forge       21kB
+  + xorg-libxi                                   1.8.4  h7cc23a3_0                conda-forge       50kB
+  + xorg-libxrandr                               1.5.5  h7cc23a3_1                conda-forge       31kB
+  + xorg-libxrender                             0.9.13  h7cc23a3_0                conda-forge       35kB
+  + xorg-libxscrnsaver                           1.2.4  hb9d3cd8_0                conda-forge       14kB
+  + xorg-libxtst                                 1.2.6  h7cc23a3_0                conda-forge       35kB
+  + xorg-libxxf86vm                              1.1.7  h7cc23a3_1                conda-forge       20kB
+  + xorg-xorgproto                              2025.1  hebe6cf0_3                conda-forge      596kB
+  + yaml-cpp                                     0.8.0  h54a6638_1                conda-forge      243kB
+  + zstd                                         1.5.7  hb78ec9c_7                conda-forge     Cached
+
+  Summary:
+
+  Install: 263 packages
+
+  Total download: 2GB
+
+──────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+warning  libmamba Security Warning: This transaction includes executing package scripts (pre/post-link/unlink) if present. These scripts can contain arbitrary code. Please ensure you trust the package sources.
+
+Transaction starting
+Linking cuda-version-12.9-h4f385c5_3
+Linking _x86_64-microarch-level-4-3_x86_64_v4
+Linking ca-certificates-2026.10.23-hbd8a1cb_0
+Linking font-ttf-dejavu-sans-mono-2.37-hab24e00_0
+Linking font-ttf-inconsolata-3.000-h77eed37_0
+Linking font-ttf-source-code-pro-2.038-h77eed37_0
+Linking font-ttf-ubuntu-0.83-h77eed37_4
+Linking python_abi-3.15-9_cp315
+Linking wayland-protocols-1.50-hd8ed1ab_0
+Linking tzdata-2026e-h5d301ff_0
+Linking cuda-cudart_linux-64-12.9.79-h3f2d84a_0
+Linking fonts-conda-forge-1-hc364b38_1
+Linking fonts-conda-ecosystem-1-0
+Linking libglvnd-1.7.0-ha4b6fd6_5
+Linking libzlib-1.3.2-h25fd6f3_3
+Linking eigen-abi-5.0.1.80-hf414acd_3
+Linking eigen-5.0.1-h19c2612_3
+Linking libgomp-16.2.0-he0feb66_7
+Linking libegl-1.7.0-ha4b6fd6_5
+Linking libopengl-1.7.0-ha4b6fd6_5
+Linking zstd-1.5.7-hb78ec9c_7
+Linking _openmp_mutex-4.5-20_gnu
+Linking ld_impl_linux-64-2.46.1-default_hbd61a6d_103
+Linking libgcc-16.2.0-ha9f2e26_7
+Linking libev-4.33-h280c20c_3
+Linking c-ares-1.34.9-hebe6cf0_0
+Linking libmpdec-4.0.0-hb03c661_2
+Linking tk-8.6.13-noxft_h1df4ec4_4
+Linking ncurses-6.6-hdb14827_1
+Linking libntlm-1.8-hebe6cf0_2
+Linking libxcrypt-4.4.38-h280c20c_0
+Linking keyutils-1.6.3-h7cc23a3_1
+Linking aws-c-common-1.0.5-hebe6cf0_0
+Linking xorg-xorgproto-2025.1-hebe6cf0_3
+Linking rav1e-0.8.1-hbab41bb_1
+Linking libuuid-2.42.4-hcfc3c73_1
+Linking libogg-1.3.5-hd0c01bc_1
+Linking fribidi-1.0.18-h7cc23a3_0
+Linking libcap-2.78-h084b8d7_1
+Linking libdav1d7-1.5.4-hebe6cf0_4
+Linking libopus-1.6.1-hebe6cf0_1
+Linking x264-1!164.3095-pl5321h63c0a64_3
+Linking libdovi-3.4.0-h39d0f39_1
+Linking libbrotlicommon-1.2.1-h39a168f_1
+Linking alsa-lib-1.2.16.1-h7cc23a3_1
+Linking xorg-libxau-1.0.12-h7cc23a3_2
+Linking xorg-libice-1.1.2-h280c20c_0
+Linking xorg-libxdmcp-1.1.5-h7cc23a3_2
+Linking libgfortran5-16.2.0-h6b99dfc_7
+Linking libwebp-base-1.6.0-hd42ef1d_1
+Linking giflib-6.1.3-hebe6cf0_2
+Linking libexpat-2.9.0-hd2095e1_0
+Linking libiconv-1.18-h0cb94f2_3
+Linking libffi-3.7.0-h81df57d_1
+Linking openssl-3.6.5-h781a0a9_0
+Linking libpciaccess-0.19-hb03c661_1
+Linking bzip2-1.0.8-hda65f42_10
+Linking liblzma-5.8.3-hb03c661_1
+Linking libdeflate-1.26-h351257e_0
+Linking libgcc-ng-16.2.0-h69a702a_7
+Linking libpng-1.6.59-h922cc85_0
+Linking libjpeg-turbo-3.2.1-h7cc23a3_0
+Linking pthread-stubs-0.4-h7cc23a3_1004
+Linking libstdcxx-16.2.0-h934c35e_7
+Linking libedit-3.1.20260512-pl5321h373387f_0
+Linking aws-checksums-1.0.1-ha404f16_1
+Linking aws-c-compression-1.0.0-ha404f16_1
+Linking aws-c-sdkutils-1.0.1-ha404f16_0
+Linking libudev1-262.2-h26e0ef7_1
+Linking libsystemd0-262.2-h26e0ef7_1
+Linking libbrotlienc-1.2.1-h018ffa1_1
+Linking libbrotlidec-1.2.1-ha411449_1
+Linking xorg-libsm-1.2.6-h0d788c3_1
+Linking libgfortran-16.2.0-h69a702a_7
+Linking aws-c-cal-1.0.0-hcf7459e_1
+Linking libssh2-1.11.1-h6154650_1
+Linking s2n-1.7.13-h6b754c5_0
+Linking libdrm-2.4.129-h7cc23a3_0
+Linking pcre2-10.49-h8b3dc9c_0
+Linking vlfeat-0.9.21-hd590300_1
+Linking jxrlib-1.1-hd590300_3
+Linking libfreetype6-2.14.3-h5e6c136_2
+Linking libxcb-1.17.0-hb83e432_3
+Linking intel-gmmlib-22.10.2-h7148c6a_0
+Linking libnghttp2-1.71.0-hc5e5977_0
+Linking libunwind-1.8.3-hd2e8b67_1
+Linking liburing-2.15-h4dbf13b_0
+Linking yaml-cpp-0.8.0-h54a6638_1
+Linking minizip-4.2.2-haac24f3_1
+Linking opencl-headers-2025.06.13-hecca717_0
+Linking libde265-1.1.3-h4dbf13b_1
+Linking pixman-0.46.4-h54a6638_3
+Linking libaec-1.1.8-h659bb9a_0
+Linking libflac-1.5.0-he200343_1
+Linking mpg123-1.33.7-h877a99e_1
+Linking libhwy-1.4.0-h57c4cff_2
+Linking snappy-1.3.1-h7edda9a_1
+Linking spirv-tools-2026.4-h7148c6a_2
+Linking graphite2-1.3.15-h54a6638_1
+Linking cuda-nvrtc-12.9.86-hecca717_1
+Linking libnvjitlink-12.9.86-hecca717_2
+Linking libvorbis-1.3.7-h54a6638_2
+Linking x265-3.5-h73f68a7_4
+Linking level-zero-1.34.0-h7148c6a_0
+Linking wayland-1.26.0-hc1c935e_2
+Linking gflags-2.3.1-hee9eb32_0
+Linking gmp-6.3.0-hfd2156b_3
+Linking pystring-1.2.0-h171cf75_0
+Linking imath-3.2.3-h923cf36_1
+Linking libvpx-1.17.0-hd2095e1_0
+Linking openh264-2.7.0-h8c49934_0
+Linking aom-3.15.3-pl5321h57e6904_0
+Linking svt-av1-4.3.0-hd2095e1_0
+Linking metis-5.1.0-h86e3903_1008
+Linking icu-78.3-py310h44b86e0_2
+Linking lerc-4.3.0-he78707d_0
+Linking pugixml-1.15-h3f63f65_0
+Linking libultrahdr-2.0.2-h6f1b2e9_0
+Linking double-conversion-3.4.0-hecca717_0
+Linking libcurand-10.3.10.19-h676940d_1
+Linking libglu-9.0.3-h5888daf_1
+Linking libabseil-20260817.0-cxx17_hbb87c76_2
+Linking lz4-c-1.11.1-hee9eb32_0
+Linking cuda-cudart-12.9.79-h5888daf_0
+Linking krb5-1.22.2-hbc21106_2
+Linking libusb-1.0.30-h0d1bbbc_1
+Linking libopenblas-0.3.34-pthreads_hf13c14d_2
+Linking libsuitesparseconfig-7.10.1-h92d6892_7100102
+Linking aws-c-io-1.1.2-he71e18f_1
+Linking libglib-2.90.1-hb382ddc_3
+Linking libfreetype-2.14.3-ha770c72_2
+Linking xcb-util-0.4.1-h4f16b4b_2
+Linking xcb-util-renderutil-0.3.10-hb711507_0
+Linking xcb-util-keysyms-0.4.1-hb711507_0
+Linking xcb-util-wm-0.4.2-hb711507_0
+Linking xorg-libx11-1.8.14-hb83e432_0
+Linking ocl-icd-2.3.4-hb03c661_1
+Linking lame-4.0-h770b6ad_1
+Linking libjxl-0.13.0-heb2dce7_0
+Linking glslang-16.6.0-h980caa0_0
+Linking libcublas-12.9.2.10-h676940d_0
+Linking libcusparse-12.5.10.65-hecca717_2
+Linking glog-0.7.1-hb7133d2_1
+Linking mpfr-4.2.2-ha2cb11d_1
+Linking libopencolorio-2.6.0-h59f12a5_7
+Linking libavif16-1.4.2-h0563ae5_6
+Linking libpsl-0.23.1-hd9e3e90_1
+Linking libxml2-16-2.15.4-hf3af7cc_1
+Linking libsqlite-3.54.1-h13e7031_0
+Linking libboost-1.90.0-h1101c1b_3
+Linking libtiff-4.7.2-h6d37cbf_2
+Linking libre2-11-2025.11.05-h02ca46f_4
+Linking libprotobuf-7.35.1-h8a00109_4
+Linking libcups-2.3.3-h7a8fb5f_6
+Linking cyrus-sasl-2.1.28-hac629b4_1
+Linking libblas-3.11.0-12_h4a7cf45_openblas
+Linking libbtf-2.3.2-h32481e8_7100102
+Linking libldl-3.3.2-h32481e8_7100102
+Linking libcamd-3.3.3-h32481e8_7100102
+Linking libamd-3.3.3-haaf9dc3_7100102
+Linking libcolamd-3.3.4-h32481e8_7100102
+Linking libccolamd-3.3.4-h32481e8_7100102
+Linking librbio-4.3.4-h32481e8_7100102
+Linking libcxsparse-4.4.1-h32481e8_7100102
+Linking aws-c-http-1.0.0-hb7dfbc4_2
+Linking dbus-1.16.2-he8c428d_2
+Linking freetype-2.14.3-ha770c72_2
+Linking fontconfig-2.18.3-h4db4eae_2
+Linking xcb-util-image-0.4.0-hb711507_2
+Linking xkeyboard-config-2.48-hebe6cf0_1
+Linking xorg-libxfixes-6.0.2-h7cc23a3_1
+Linking xorg-libxext-1.3.7-h7cc23a3_1
+Linking libglx-1.7.0-ha4b6fd6_5
+Linking xorg-libxrender-0.9.13-h7cc23a3_0
+Linking libsndfile-1.2.2-hbc6d301_3
+Linking shaderc-2026.4-hcebf71c_1
+Linking libcusolver-11.7.5.82-h676940d_2
+Linking libheif-1.23.7-gpl_h002e341_103
+Linking libcurl-8.23.0-ha042cf0_0
+Linking libxml2-2.15.4-h7df9aa5_1
+Linking python-3.15.2-h6e52b48_100_cp315
+Linking gdk-pixbuf-2.44.8-h68053f1_2
+warning  libmamba Executing post-link script for package 'gdk-pixbuf'.
+
+Linking lcms2-2.20-h9073bf1_0
+Linking openjpeg-2.5.4-heb1ab33_2
+Linking openjph-0.33.0-h2a08dbc_0
+Linking re2-2025.11.05-hbf548d4_4
+Linking openldap-2.6.13-hbde042b_0
+Linking libcblas-3.11.0-12_h0358290_openblas
+Linking liblapack-3.11.0-12_h47877c9_openblas
+Linking libspex-3.2.3-had10066_7100102
+Linking aws-c-auth-1.0.2-h2824ed8_1
+Linking xcb-util-cursor-0.1.6-hb03c661_0
+Linking xorg-libxcomposite-0.4.7-hb03c661_0
+Linking xorg-libxscrnsaver-1.2.4-hb9d3cd8_0
+Linking xorg-libxi-1.8.4-h7cc23a3_0
+Linking xorg-libxxf86vm-1.1.7-h7cc23a3_1
+Linking xorg-libxdamage-1.1.6-hb9d3cd8_0
+Linking libglx-devel-1.7.0-ha4b6fd6_5
+Linking libgl-1.7.0-ha4b6fd6_5
+Linking xorg-libxcursor-1.2.3-h7cc23a3_1
+Linking xorg-libxrandr-1.5.5-h7cc23a3_1
+Linking cairo-1.18.6-h3c89d7e_0
+Linking pulseaudio-client-17.0-hb10c1b2_4
+Linking libhwloc-2.15.0-default_hd7c4d0c_1001
+Linking libxkbcommon-1.13.2-h59c2f34_2
+Linking dcmtk-3.7.0-h43deee3_0
+Linking openexr-3.5.4-h6fc6928_0
+Linking onnxruntime-cpp-1.32.0-h49c692b_0_cpu
+Linking libpq-18.7-h3883810_0
+Linking numpy-2.5.5-py315h50affdf_1
+Linking libfaiss-1.14.3-cuda129h26894d9_501_cuda
+Linking libcholmod-5.3.1-h59ddab4_7100102
+Linking aws-c-s3-1.3.1-hf63ef51_1
+Linking xorg-libxtst-1.2.6-h7cc23a3_0
+Linking freeglut-3.2.2-h215f996_4
+Linking libva-2.24.1-hb83e432_1
+Linking libgl-devel-1.7.0-ha4b6fd6_5
+Linking glew-2.3.0-h71661d4_0
+Linking libvulkan-loader-1.4.357.0-h0e34353_2
+Linking libharfbuzz-15.0.0-h23af247_0
+Linking tbb-2023.1.0-haa8c3ee_4
+Linking poselib-2.0.5-np2py315h515ddb1_1
+Linking libklu-2.3.5-hf24d653_7100102
+Linking libspqr-4.3.4-h852d39f_7100102
+Linking libumfpack-6.3.5-heb53515_7100102
+Linking hdf5-2.2.0-nompi_h35f8cf1_102
+Linking jasper-4.2.9-hd038ad9_2
+Linking intel-media-driver-26.1.6-hecca717_0
+Linking libegl-devel-1.7.0-ha4b6fd6_5
+Linking sdl3-3.4.20-h8e1bbd5_2
+Linking libplacebo-7.387.0-h9669efe_0
+Linking libpango-1.58.2-hce4e988_3
+Linking libharfbuzz-devel-15.0.0-h23af247_0
+Linking libass-0.17.5-h3b6f6bf_1
+Linking libopenvino-2026.4.1-hab39aeb_2
+Linking libparu-1.0.0-h17147ab_7100102
+Linking flann-1.9.2-h2239a5b_7
+Linking libraw-0.22.3-hab3bfc1_0
+Linking libvpl-2.16.0-h54a6638_0
+Linking qt6-main-6.12.0-pl5321hb5a8836_2
+Linking sdl2-2.32.56-hee9eb32_1
+Linking libpango-devel-1.58.2-h317d9d0_3
+Linking libopenvino-auto-batch-plugin-2026.4.1-h7c4c8b8_2
+Linking libopenvino-paddle-frontend-2026.4.1-hff0d05b_2
+Linking libopenvino-hetero-plugin-2026.4.1-he798987_2
+Linking libopenvino-gguf-frontend-2026.4.1-h7c4c8b8_2
+Linking libopenvino-intel-cpu-plugin-2026.4.1-hab39aeb_2
+Linking libopenvino-pytorch-frontend-2026.4.1-h90c3318_2
+Linking libopenvino-tensorflow-frontend-2026.4.1-hf340240_2
+Linking libopenvino-onnx-frontend-2026.4.1-hff0d05b_2
+Linking libopenvino-tensorflow-lite-frontend-2026.4.1-h90c3318_2
+Linking libopenvino-intel-gpu-plugin-2026.4.1-hab39aeb_2
+Linking libopenvino-auto-plugin-2026.4.1-h7c4c8b8_2
+Linking libopenvino-intel-npu-plugin-2026.4.1-hab39aeb_2
+Linking libopenvino-ir-frontend-2026.4.1-he798987_2
+Linking suitesparse-7.10.1-ha0f6916_7100102
+Linking freeimage-3.18.0-h3038e8d_27
+Linking pango-1.58.2-h2f58602_3
+Linking ceres-solver-2.2.0-gpugplh1a3d155_311
+Linking librsvg-2.62.4-ha427ee3_0
+Linking ffmpeg-9.0.2-gpl_hac98dcb_908
+Linking libopenimageio-3.2.2.0-h8915cf7_2
+Linking colmap-4.2.1-cuda_129gpl_h960d87c_408
+
+Transaction finished
+
+
+To activate this environment, use:
+
+    micromamba activate /opt/colmap_env
+
+Or to execute a single command in this environment, use:
+
+    micromamba run -p /opt/colmap_env mycommand
+

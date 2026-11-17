@@ -122,3 +122,8 @@ compile_commands.json
 *.dump
 # Difix3D clone created by scripts/setup_difix.sh
 /third_party/
+
+# Reproduction artifacts are tracked despite the generic ENV/ and *.log rules above
+!reproduction/env/
+!reproduction/logs/
+!reproduction/logs/*.log
