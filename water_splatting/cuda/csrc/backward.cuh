@@ -86,7 +86,8 @@ __global__ void rasterize_backward_kernel(
     float* __restrict__ v_opacity,
     float3* __restrict__ v_medium_rgb,
     float3* __restrict__ v_medium_bs,
-    float3* __restrict__ v_medium_attn
+    float3* __restrict__ v_medium_attn,
+    float* __restrict__ v_depth
 );
 
 __device__ void project_cov3d_ewa_vjp(

@@ -167,7 +167,8 @@ __global__ void rasterize_backward_kernel(
     float* __restrict__ v_opacity,
     float3* __restrict__ v_medium_rgb,
     float3* __restrict__ v_medium_bs,
-    float3* __restrict__ v_medium_attn
+    float3* __restrict__ v_medium_attn,
+    float* __restrict__ v_depth
 ) {
     auto block = cg::this_thread_block();
     int32_t tile_id =
@@ -291,6 +292,7 @@ __global__ void rasterize_backward_kernel(
             float2 v_xy_local = {0.f, 0.f};
             float2 v_xy_abs_local = {0.f, 0.f};
             float v_z_abs_local = 0.f;
+            float v_depth_local = 0.f;
             float v_opacity_local = 0.f;
             float3 v_medium_rgb_pix_local = {0.f, 0.f, 0.f};
             float3 v_medium_bs_pix_local = {0.f, 0.f, 0.f};
@@ -351,6 +353,22 @@ __global__ void rasterize_backward_kernel(
                 v_z_abs_local += fabsf(v_exp_attn_local.y * medium_attn_pix.y);
                 v_z_abs_local += fabsf(v_exp_attn_local.z * medium_attn_pix.z);
 
+                // Medium-aware depth gradient dC/ds_i (s_i = camera depth of this gaussian).
+                // Object term   C^obj_i = T_i a_i c_i exp(-s^attn s_i)
+                //   -> dC^obj/ds_i = -s^attn * T_i a_i c_i exp(-s^attn s_i)
+                // Medium terms  C^med_i = T_i c^med [exp(-s^bs s_{i-1}) - exp(-s^bs s_i)]
+                //               C^med_{i+1} = T_{i+1} c^med [exp(-s^bs s_i) - exp(-s^bs s_{i+1})]
+                //   (for the last gaussian C^med_{i+1} is the background term with T_final)
+                //   -> d(C^med_i + C^med_{i+1})/ds_i = s^bs c^med exp(-s^bs s_i) (T_i - T_{i+1})
+                //                                   = s^bs c^med exp(-s^bs s_i) T_i a_i
+                // Here fac = a_i T_i and v_exp_attn_local = v_out * fac * exp_attn * rgb.
+                v_depth_local += -medium_attn_pix.x * v_exp_attn_local.x
+                                 + v_out_med.x * medium_bs_pix.x * fac * medium_rgb_pix.x * exp_bs.x;
+                v_depth_local += -medium_attn_pix.y * v_exp_attn_local.y
+                                 + v_out_med.y * medium_bs_pix.y * fac * medium_rgb_pix.y * exp_bs.y;
+                v_depth_local += -medium_attn_pix.z * v_exp_attn_local.z
+                                 + v_out_med.z * medium_bs_pix.z * fac * medium_rgb_pix.z * exp_bs.z;
+
                 // contribution from this pixel
                 v_alpha += (rgb.x * T * exp_attn.x - buffer.x * ra) * v_out.x - buffer_medium.x * ra * v_out_med.x;
                 v_alpha += (rgb.y * T * exp_attn.y - buffer.y * ra) * v_out.y - buffer_medium.y * ra * v_out_med.y;
@@ -386,6 +404,7 @@ __global__ void rasterize_backward_kernel(
             warpSum2(v_xy_local, warp);
             warpSum2(v_xy_abs_local, warp);
             warpSum(v_z_abs_local, warp);
+            warpSum(v_depth_local, warp);
             warpSum(v_opacity_local, warp);
             warpSum3(v_medium_rgb_pix_local, warp);
             warpSum3(v_medium_bs_pix_local, warp);
@@ -411,6 +430,8 @@ __global__ void rasterize_backward_kernel(
                 atomicAdd(v_xy_abs_ptr + 2*g + 1, v_xy_abs_local.y);
                 
                 atomicAdd(v_opacity + g, v_opacity_local);
+
+                atomicAdd(v_depth + g, v_depth_local);
 
                 float* v_medium_attn_ptr = (float*)(v_medium_attn);
                 atomicAdd(v_medium_attn_ptr + 3*pix_id + 0, v_medium_attn_pix_local.x);

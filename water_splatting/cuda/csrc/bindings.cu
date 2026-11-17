@@ -642,7 +642,8 @@ std::
         torch::Tensor, // dL_dopacity
         torch::Tensor, // dL_dmedium_rgb
         torch::Tensor, // dL_dmedium_bs
-        torch::Tensor  // dL_dmedium_attn
+        torch::Tensor, // dL_dmedium_attn
+        torch::Tensor  // dL_ddepth
         >
     rasterize_backward_tensor(
         const unsigned img_height,
@@ -698,6 +699,7 @@ std::
     torch::Tensor v_medium_rgb = torch::zeros({img_height, img_width, 3}, xys.options());
     torch::Tensor v_medium_bs = torch::zeros({img_height, img_width, 3}, xys.options());
     torch::Tensor v_medium_attn = torch::zeros({img_height, img_width, 3}, xys.options());
+    torch::Tensor v_depth = torch::zeros(depths.sizes(), xys.options());
 
     rasterize_backward_kernel<<<tile_bounds, block>>>(
         tile_bounds,
@@ -726,8 +728,9 @@ std::
         v_opacity.contiguous().data_ptr<float>(),
         (float3 *)v_medium_rgb.contiguous().data_ptr<float>(),
         (float3 *)v_medium_bs.contiguous().data_ptr<float>(),
-        (float3 *)v_medium_attn.contiguous().data_ptr<float>()
+        (float3 *)v_medium_attn.contiguous().data_ptr<float>(),
+        v_depth.data_ptr<float>()
     );
 
-    return std::make_tuple(v_xy, v_conic, v_colors, v_opacity, v_medium_rgb, v_medium_bs, v_medium_attn);
+    return std::make_tuple(v_xy, v_conic, v_colors, v_opacity, v_medium_rgb, v_medium_bs, v_medium_attn, v_depth);
 }

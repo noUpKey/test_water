@@ -197,7 +197,8 @@ std::
         torch::Tensor, // dL_dopacity
         torch::Tensor, // dL_dmedium_rgb
         torch::Tensor, // dL_dmedium_bs
-        torch::Tensor  // dL_dmedium_attn
+        torch::Tensor, // dL_dmedium_attn
+        torch::Tensor  // dL_ddepth
         >
     rasterize_backward_tensor(
         const unsigned img_height,

@@ -29,6 +29,7 @@ def rasterize_gaussians(
     background: Optional[Float[Tensor, "*height width channels"]] = None,
     return_alpha: Optional[bool] = False,
     step: Optional[int] = None,
+    depth_grad_scale: float = 0.0,
 ) -> Tensor:
     """Rasterizes 2D gaussians by sorting and binning gaussian intersections for each tile and returns an N-dimensional output using alpha-compositing.
 
@@ -52,6 +53,8 @@ def rasterize_gaussians(
         block_width (int): MUST match whatever block width was used in the project_gaussians call. integer number of pixels between 2 and 16 inclusive
         background (Tensor): background color
         return_alpha (bool): whether to return alpha channel
+        depth_grad_scale (float): scale of the medium-aware gradient w.r.t. the gaussian depths
+            (attenuation / backscatter terms). 0 disables it (original WaterSplatting behaviour).
 
     Returns:
         A Tensor:
@@ -100,6 +103,7 @@ def rasterize_gaussians(
         background.contiguous(),
         return_alpha,
         step,
+        float(depth_grad_scale),
     )
 
 
@@ -126,6 +130,7 @@ class _RasterizeGaussians(Function):
         background: Optional[Float[Tensor, "channels"]] = None,
         return_alpha: Optional[bool] = False,
         step: Optional[int] = None,
+        depth_grad_scale: float = 0.0,
     ) -> Tensor:
         num_points = xys.size(0)
         tile_bounds = (
@@ -191,6 +196,7 @@ class _RasterizeGaussians(Function):
         ctx.img_height = img_height
         ctx.num_intersects = num_intersects
         ctx.block_width = block_width
+        ctx.depth_grad_scale = depth_grad_scale
         ctx.save_for_backward(
             gaussian_ids_sorted,
             tile_bins,
@@ -250,13 +256,13 @@ class _RasterizeGaussians(Function):
             v_medium_rgb = torch.zeros_like(medium_rgb)
             v_medium_bs = torch.zeros_like(medium_bs)
             v_medium_attn = torch.zeros_like(medium_attn)
+            v_depth = None
 
         else:
-            if colors.shape[-1] == 3:
-                rasterize_fn = _C.rasterize_backward
-            else:
-                rasterize_fn = _C.nd_rasterize_backward
-            v_xy, v_conic, v_colors, v_opacity, v_medium_rgb, v_medium_bs, v_medium_attn = rasterize_fn(
+            if colors.shape[-1] != 3:
+                raise NotImplementedError("WaterSplatting backward only supports 3 colour channels")
+            rasterize_fn = _C.rasterize_backward
+            v_xy, v_conic, v_colors, v_opacity, v_medium_rgb, v_medium_bs, v_medium_attn, v_depth = rasterize_fn(
                 img_height,
                 img_width,
                 ctx.block_width,
@@ -279,11 +285,15 @@ class _RasterizeGaussians(Function):
                 v_out_medium,
                 v_out_alpha,
             )
-            
+            if ctx.depth_grad_scale != 0.0:
+                v_depth = v_depth * ctx.depth_grad_scale
+            else:
+                v_depth = None  # original behaviour: depths receive no gradient
+
         return (
             v_xy,  # xys
             None,  # xys_grad_abs
-            None,  # depths
+            v_depth,  # depths
             None,  # radii
             v_conic,  # conics
             None,  # num_tiles_hit
@@ -298,4 +308,5 @@ class _RasterizeGaussians(Function):
             None,  # background
             None,  # return_alpha
             None,  # step
+            None,  # depth_grad_scale
         )
