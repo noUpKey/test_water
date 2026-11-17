@@ -35,6 +35,74 @@ Furthermore, it does so while offering real-time rendering performance.
 </p>
 <br>
 
+## Extensions in this fork
+
+This fork adds two optional extensions on top of the official code. Both are **off by default**, so
+`ns-train water-splatting` reproduces the original method exactly.
+
+### 1. Medium-decoupled generative refinement (MDGR): `ns-train water-splatting-pseudo`
+
+**Motivation.** Measured on the reproduction renders (`scripts/radial_metrics.py`), the test error is concentrated at the image borders.
+That is where few of the 15–25 training cameras overlap. The water itself is modelled well.
+
+| scene (seed 42, T4) | centre | ring 2 | ring 3 | corner |
+|---|---|---|---|---|
+| IUI3-RedSea | 31.01 | 30.92 | 27.63 | **22.46** |
+| Curaçao | 32.28 | 33.01 | 30.38 | **26.97** |
+| J.G. RedSea | 25.85 | 27.74 | 22.40 | **18.93** |
+| Panama | 33.79 | 31.20 | 31.26 | 31.37 |
+
+(PSNR in dB, concentric rings from the image centre to the corners.)
+
+**Method.** Every `pseudo_every` steps:
+
+1. Sample pseudo-camera poses only from the *training* trajectory: interpolation between neighbouring cameras, plus small yaw/pitch, in-plane and backward perturbations.
+   Stepping backward brings the poorly observed training-view borders into the frame. No test poses or test images are used.
+2. Render each pseudo-view decomposed as `I = A·J + B`.
+   `J` is the restored (medium-free) image, `B` the backscatter, and `A = J_att / J` the effective per-pixel attenuation.
+3. Repair `J`, not `I`, with the single-step diffusion fixer [Difix](https://github.com/nv-tlabs/Difix3D) (Wu et al., CVPR 2025).
+   Difix is trained on in-air images, so the restored image is in-distribution for it, while the hazy underwater render is not.
+   For the reference-guided `difix_ref`, the reference is the nearest training image restored with the model's own medium, `(I_gt − B)/A`.
+4. Re-apply the learned medium to get the pseudo-target `A·Fix(J) + B`.
+   It is consistent with the water model by construction: an identity fixer reproduces the render exactly (`tests/test_pseudo_views.py`).
+5. Distil the targets with an L1 + D-SSIM loss on one random pseudo-view per step (probability `pseudo_prob`, weight `pseudo_loss_weight`).
+   The medium field gets no gradient from pseudo-views, and pseudo-views do not drive densification.
+
+Code: [`water_splatting/pseudo_views.py`](water_splatting/pseudo_views.py) and the `MDGR` section of [`water_splatting/water_splatting.py`](water_splatting/water_splatting.py).
+
+```bash
+bash scripts/setup_difix.sh && export DIFIX_SRC=$(pwd)/third_party/Difix3D/src   # Difix pins py3.8-compatible deps
+ns-train water-splatting-pseudo --vis tensorboard --machine.seed 42 \
+    --pipeline.model.pseudo-debug-dir outputs/mdgr_debug \
+    colmap --downscale-factor 1 --colmap-path sparse --data <scene> --images-path images --eval-mode interval --eval-interval 8
+# full ablation (baseline / identity self-distillation / Difix in underwater space / MDGR) + ring metrics:
+bash scripts/run_mdgr_ablation.sh <scene> <scene_name> 42
+```
+
+Main options (`--pipeline.model.<name>`):
+
+- `pseudo-fixer {difix_ref,difix,identity}` and `pseudo-fix-space {clear,underwater}`.
+- `pseudo-start-step 7000`, `pseudo-every 2000`, `pseudo-num-views 0` (0 means 2× the number of training views).
+- `pseudo-loss-weight 0.3`, `pseudo-prob 0.5`, `pseudo-downscale 2`.
+
+On a T4, each refresh round takes roughly a minute and the per-step cost rises by about 25 %.
+The Difix weights are under the NVIDIA license (non-commercial research use).
+
+### 2. Medium-aware depth gradient: `--pipeline.model.medium-depth-grad-scale <s>`
+
+The rendered colour depends on each Gaussian's depth through `exp(-σ_attn s_i)` and through the backscatter segments.
+The original rasterizer drops `dC/ds_i`, so the water model never informs Gaussian positions.
+The CUDA backward pass now computes it:
+
+`dC/ds_i = α_i T_i [−σ_attn c_i e^(−σ_attn s_i) + σ_bs c_med e^(−σ_bs s_i)]`
+
+It is applied with scale `s` (default 0, the original behaviour). Check it with `python scripts/check_depth_grad.py` on a GPU.
+
+### Reproduction
+
+[`reproduction/`](reproduction/) holds the seed-42 reproduction on a Kaggle T4 (average PSNR 29.32 vs 29.69 in the paper).
+It contains the splits, per-scene `eval.json` and `config.yml`, environment dumps and training logs.
+
 ## Installation
 
 Our method is based on [nerfstudio](https://docs.nerf.studio/index.html).

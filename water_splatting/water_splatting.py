@@ -20,6 +20,9 @@ Python package for combining 3DGS with volume rendering to enable water/fog mode
 from __future__ import annotations
 
 import math
+import os
+import random
+import time
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple, Type, Union
 
@@ -164,6 +167,59 @@ class WaterSplattingModelConfig(ModelConfig):
     """Bias for medium density (sigma_bs and sigma_attn)."""
     mlp_type: Literal["tcnn", "torch"] = "tcnn"
     """Type of MLP to use for medium MLP."""
+    medium_depth_grad_scale: float = 0.0
+    """Scale of the medium-aware depth gradient. The rendered colour depends on each gaussian's depth s_i through
+    exp(-sigma_attn s_i) (Eq. 16) and the backscatter segments (Eq. 17-18), but the original rasterizer drops dC/ds_i,
+    so gaussian positions are only optimised through their 2D projection. A value > 0 back-propagates this gradient
+    to the gaussian means (0.0 = original WaterSplatting behaviour)."""
+
+    # ---------------- Medium-decoupled generative refinement (MDGR), see water_splatting/pseudo_views.py ----------
+    pseudo_views: bool = False
+    """Enable MDGR: periodically render pseudo-views around the training trajectory, repair their *restored*
+    (medium-free) image with a diffusion fixer, re-apply the learned medium and distil them back as extra targets."""
+    pseudo_start_step: int = 7000
+    """First refresh round (after the coarse-to-fine schedule has reached full resolution at step 6000)."""
+    pseudo_every: int = 2000
+    """Steps between refresh rounds (the pseudo-targets are re-generated from the improved model each round)."""
+    pseudo_stop_step: int = 13500
+    """No refresh round starts after this step (the pseudo loss itself stays active until the end)."""
+    pseudo_num_views: int = 0
+    """Pseudo-views per round. 0 -> 2 x number of training views."""
+    pseudo_interp_ratio: float = 0.5
+    """Fraction of pseudo-views interpolated between neighbouring training cameras (rest: perturbed cameras)."""
+    pseudo_rot_jitter_deg: float = 5.0
+    """Maximum yaw/pitch perturbation of perturbed pseudo-views (degrees)."""
+    pseudo_trans_jitter: float = 0.5
+    """Maximum in-plane translation of perturbed pseudo-views, in units of the median training-camera spacing."""
+    pseudo_backward_jitter: float = 0.5
+    """Maximum backward step of perturbed pseudo-views (median spacing units); widens the frustum to cover the
+    poorly observed image borders."""
+    pseudo_downscale: int = 2
+    """Pseudo-views are rendered / supervised at 1/pseudo_downscale of the training resolution."""
+    pseudo_loss_weight: float = 0.3
+    """Weight of the pseudo-view loss relative to the main loss."""
+    pseudo_prob: float = 0.5
+    """Probability per training step of adding one pseudo-view to the loss."""
+    pseudo_fix_space: Literal["clear", "underwater"] = "clear"
+    """'clear' = MDGR (fix the restored image, re-apply the medium); 'underwater' = plain Difix3D-style baseline."""
+    pseudo_fixer: Literal["difix_ref", "difix", "identity"] = "difix_ref"
+    """Fixer backend. 'identity' = self-distillation on pseudo-views without any generative prior (ablation)."""
+    pseudo_fixer_model: str = ""
+    """HuggingFace model id override (default nvidia/difix_ref or nvidia/difix)."""
+    pseudo_difix_src: str = ""
+    """Path to Difix3D/src containing pipeline_difix.py (or set the DIFIX_SRC environment variable)."""
+    pseudo_fixer_fp16: bool = True
+    """Run the fixer in float16 (needed to fit a T4 comfortably)."""
+    pseudo_fixer_max_side: int = 1024
+    """The fixer runs at most at this resolution (long side); outputs are resized back."""
+    pseudo_color_match: bool = True
+    """Match the per-channel mean/std of the fixer output to its input (guards against global colour drift)."""
+    pseudo_detach_medium: bool = True
+    """The medium field receives no gradient from pseudo-views: water is learned from real observations only."""
+    pseudo_debug_dir: str = ""
+    """If set, save [render | fixer input | fixer output | pseudo-target | reference] strips for a few views per round."""
+    pseudo_seed: int = 0
+    """Seed for pseudo-pose sampling and pseudo-view selection."""
 
 
 class WaterSplattingModel(Model):
@@ -274,6 +330,13 @@ class WaterSplattingModel(Model):
             )  # This color is the same as the default background color in Viser. This would only affect the background color when rendering.
         else:
             self.background_color = get_color(self.config.background_color)
+
+        # MDGR state. Plain python containers on purpose: nothing here is part of the state_dict / checkpoints.
+        self._pseudo_ctx: Dict[str, object] = {"datamanager": None, "fixer": None}
+        self._pseudo_cams: Optional[Cameras] = None
+        self._pseudo_targets: List[torch.Tensor] = []
+        self._pseudo_pass = False
+        self._pseudo_rng = random.Random(self.config.pseudo_seed)
 
     @property
     def colors(self):
@@ -667,7 +730,205 @@ class WaterSplattingModel(Model):
                 args=[training_callback_attributes.optimizers],
             )
         )
+        if self.config.pseudo_views:
+            # Keep a reference to the datamanager (training cameras + images) without registering it as a submodule.
+            self._pseudo_ctx["datamanager"] = training_callback_attributes.pipeline.datamanager
+            # Registered last so it runs after densification / pruning of the same step.
+            cbs.append(TrainingCallback([TrainingCallbackLocation.AFTER_TRAIN_ITERATION], self._pseudo_round_cb))
         return cbs
+
+    # ------------------------------------------------------------------------------------------------------------
+    # Medium-decoupled generative refinement (MDGR)
+    # ------------------------------------------------------------------------------------------------------------
+
+    _RENDER_STATE = ("xys", "radii", "depths", "xys_grad_abs", "last_size", "last_fx", "last_fy")
+
+    def _stash_render_state(self) -> Dict[str, object]:
+        """get_outputs() stores per-render tensors used by densification (after_train). Extra renders (pseudo-views)
+        must not overwrite those of the real training view, so we stash and restore them around such renders."""
+        return {k: getattr(self, k) for k in self._RENDER_STATE if hasattr(self, k)}
+
+    def _restore_render_state(self, state: Dict[str, object]) -> None:
+        for k, v in state.items():
+            setattr(self, k, v)
+
+    @torch.no_grad()
+    def _render_no_grad(self, camera: Cameras) -> Dict[str, torch.Tensor]:
+        """Full-resolution (for the given camera) render in eval mode without touching training state."""
+        state = self._stash_render_state()
+        was_training = self.training
+        self.eval()
+        try:
+            out = self.get_outputs(camera.to(self.device))
+        finally:
+            self.train(was_training)
+            self._restore_render_state(state)
+        return out
+
+    def _pseudo_train_image(self, idx: int) -> torch.Tensor:
+        """Float RGB training image idx (H, W, 3) on the model device."""
+        dm = self._pseudo_ctx["datamanager"]
+        cached = getattr(dm, "cached_train", None)
+        image = cached[idx]["image"] if cached is not None else dm.train_dataset[idx]["image"]
+        if image.dtype == torch.uint8:
+            image = image.float() / 255.0
+        return image[..., :3].to(self.device)
+
+    def _pseudo_round_cb(self, step: int) -> None:
+        cfg = self.config
+        if step < cfg.pseudo_start_step or step > cfg.pseudo_stop_step:
+            return
+        if (step - cfg.pseudo_start_step) % max(cfg.pseudo_every, 1) != 0:
+            return
+        self._refresh_pseudo_views(step)
+
+    def _refresh_pseudo_views(self, step: int) -> None:
+        """One MDGR round: sample pseudo poses, render, fix (in restored space), re-apply medium, store targets."""
+        from water_splatting import pseudo_views as pv
+
+        cfg = self.config
+        t0 = time.time()
+        dm = self._pseudo_ctx["datamanager"]
+        assert dm is not None, "MDGR needs the datamanager (set in get_training_callbacks)"
+        _ = getattr(dm, "cached_train", None)  # make sure images are cached (and cameras undistorted) first
+        train_cams: Cameras = dm.train_dataset.cameras
+        n_train = len(train_cams)
+        num = cfg.pseudo_num_views if cfg.pseudo_num_views > 0 else 2 * n_train
+        gen = torch.Generator().manual_seed(cfg.pseudo_seed * 100003 + step)
+
+        c2w_train = train_cams.camera_to_worlds.detach().float().cpu()
+        poses, src = pv.sample_pseudo_poses(
+            c2w_train,
+            num,
+            gen,
+            interp_ratio=cfg.pseudo_interp_ratio,
+            rot_jitter_deg=cfg.pseudo_rot_jitter_deg,
+            trans_jitter=cfg.pseudo_trans_jitter,
+            backward_jitter=cfg.pseudo_backward_jitter,
+        )
+        ref_idx = pv.nearest_reference(c2w_train, poses)
+
+        scale = 1.0 / max(cfg.pseudo_downscale, 1)
+
+        def make_cams(c2w: torch.Tensor, idx: torch.Tensor) -> Cameras:
+            """Cameras with poses c2w and the intrinsics of training cameras idx. Advanced indexing copies every
+            tensor, so rescaling never touches the datamanager's cameras."""
+
+            def take(x):
+                return None if x is None else x.detach().cpu()[idx]
+
+            cams = Cameras(
+                camera_to_worlds=c2w,
+                fx=take(train_cams.fx),
+                fy=take(train_cams.fy),
+                cx=take(train_cams.cx),
+                cy=take(train_cams.cy),
+                width=take(train_cams.width),
+                height=take(train_cams.height),
+                distortion_params=take(train_cams.distortion_params),
+                camera_type=take(train_cams.camera_type),
+            )
+            if scale != 1.0:
+                cams.rescale_output_resolution(scale)
+            return cams
+
+        pseudo_cams = make_cams(poses, src)
+
+        # ---- fixer + references -------------------------------------------------------------------------------
+        if self._pseudo_ctx["fixer"] is None:
+            self._pseudo_ctx["fixer"] = pv.make_fixer(
+                cfg.pseudo_fixer,
+                model_id=cfg.pseudo_fixer_model,
+                difix_src=cfg.pseudo_difix_src,
+                fp16=cfg.pseudo_fixer_fp16,
+                max_side=cfg.pseudo_fixer_max_side,
+            )
+        fixer = self._pseudo_ctx["fixer"]
+        use_ref = getattr(fixer, "uses_reference", False)
+        ref_cache: Dict[int, Tuple[torch.Tensor, Optional[Tuple[torch.Tensor, torch.Tensor, torch.Tensor]]]] = {}
+
+        def reference(i: int, h: int, w: int):
+            if i not in ref_cache:
+                gt = self._pseudo_train_image(i)
+                render = None
+                if cfg.pseudo_fix_space == "clear":
+                    o = self._render_no_grad(make_cams(c2w_train[i : i + 1], torch.tensor([i])))
+                    render = (o["rgb_object"], o["rgb_clear_raw"], o["rgb_medium"])
+                    gt = pv.resize_hw(gt, o["rgb"].shape[0], o["rgb"].shape[1])
+                ref_cache[i] = (gt, render)
+            gt, render = ref_cache[i]
+            if render is not None:
+                render = tuple(pv.resize_hw(r, h, w) for r in render)
+            return pv.resize_hw(gt, h, w), render
+
+        # ---- phase 1: render pseudo-views and build fixer inputs ------------------------------------------------
+        records, fixer_in, fixer_ref = [], [], []
+        for m in range(num):
+            out = self._render_no_grad(pseudo_cams[m : m + 1])
+            rgb = out["rgb"].clamp(0, 1)
+            obj, clear, med = out["rgb_object"], out["rgb_clear_raw"], out["rgb_medium"]
+            ref_gt, ref_render = (None, None)
+            if use_ref:
+                ref_gt, ref_render = reference(int(ref_idx[m]), rgb.shape[0], rgb.shape[1])
+            inp, ref, s = pv.prepare_fixer_input(rgb, obj, clear, med, cfg.pseudo_fix_space, ref_gt, ref_render)
+            fixer_in.append(inp.cpu())
+            fixer_ref.append(ref.cpu() if ref is not None else None)
+            records.append({k: v.cpu() for k, v in (("rgb", rgb), ("obj", obj), ("clear", clear), ("med", med), ("s", s))})
+        ref_cache.clear()
+
+        # ---- phase 2: generative repair ---------------------------------------------------------------------------
+        fixed = fixer(fixer_in, fixer_ref if use_ref else None)
+
+        # ---- phase 3: re-apply the learned medium -> pseudo-targets ----------------------------------------------
+        targets = []
+        for m, r in enumerate(records):
+            tgt = pv.compose_target(
+                fixed[m], r["rgb"], r["obj"], r["clear"], r["med"], r["s"], cfg.pseudo_fix_space, cfg.pseudo_color_match
+            )
+            targets.append(tgt.to(torch.float16))
+            if cfg.pseudo_debug_dir and m < 6:
+                self._save_pseudo_debug(step, m, r["rgb"], fixer_in[m], fixed[m], tgt, fixer_ref[m])
+
+        self._pseudo_cams = pseudo_cams
+        self._pseudo_targets = targets
+        delta = torch.stack([(t.float() - r["rgb"]).abs().mean() for t, r in zip(targets, records)]).mean().item()
+        CONSOLE.log(
+            f"[MDGR] step {step}: {num} pseudo-views ({cfg.pseudo_fixer}, {cfg.pseudo_fix_space} space) "
+            f"refreshed in {time.time() - t0:.1f}s, mean |target - render| = {delta:.4f}"
+        )
+
+    def _save_pseudo_debug(self, step, m, rgb, inp, fixed, tgt, ref) -> None:
+        from PIL import Image
+
+        tiles = [rgb, inp, fixed, tgt] + ([ref] if ref is not None else [])
+        strip = torch.cat([t.float().clamp(0, 1) for t in tiles], dim=1)
+        os.makedirs(self.config.pseudo_debug_dir, exist_ok=True)
+        path = os.path.join(self.config.pseudo_debug_dir, f"step{step:06d}_view{m:02d}.jpg")
+        Image.fromarray((strip.numpy() * 255 + 0.5).astype("uint8")).save(path, quality=90)
+
+    def _pseudo_view_loss(self) -> torch.Tensor:
+        """L1 + D-SSIM between the render of one random pseudo-view and its (fixed, medium-consistent) target.
+
+        Plain (unregularised) losses are used on purpose: the Reg-L1/Reg-DSSIM weights 1/(pred + eps) would amplify
+        the fixer's noise in dark regions."""
+        k = self._pseudo_rng.randrange(len(self._pseudo_targets))
+        camera = self._pseudo_cams[k : k + 1].to(self.device)
+        state = self._stash_render_state()
+        self._pseudo_pass = self.config.pseudo_detach_medium
+        try:
+            out = self.get_outputs(camera)
+        finally:
+            self._pseudo_pass = False
+            self._restore_render_state(state)
+        pred = out["rgb"]
+        target = self._pseudo_targets[k].to(self.device).float()
+        if target.shape[:2] != pred.shape[:2]:  # only possible if a refresh happened before full resolution
+            from water_splatting.pseudo_views import resize_hw
+
+            target = resize_hw(target, pred.shape[0], pred.shape[1])
+        l1 = torch.abs(pred - target).mean()
+        simloss = 1 - self.ssim(target.permute(2, 0, 1)[None], pred.permute(2, 0, 1)[None])
+        return (1 - self.config.ssim_lambda) * l1 + self.config.ssim_lambda * simloss
 
     def step_cb(self, step):
         self.step = step
@@ -790,6 +1051,9 @@ class WaterSplattingModel(Model):
             medium_rgb = torch.zeros_like(medium_rgb)
             medium_bs = torch.zeros_like(medium_bs)
             medium_attn = torch.zeros_like(medium_attn)
+        if self._pseudo_pass:
+            # MDGR pseudo-view pass: the medium is learned from real observations only.
+            medium_rgb, medium_bs, medium_attn = medium_rgb.detach(), medium_bs.detach(), medium_attn.detach()
 
         if self.crop_box is not None and not self.training:
             crop_ids = self.crop_box.within(self.means).squeeze()
@@ -846,8 +1110,9 @@ class WaterSplattingModel(Model):
             rgb = medium_rgb
             depth = medium_rgb.new_ones(*rgb.shape[:2], 1) * 10
             accumulation = medium_rgb.new_zeros(*rgb.shape[:2], 1)
-            return {"rgb": rgb, "depth": depth, "accumulation": accumulation, "background": medium_rgb, 
-                    "rgb_object": torch.zeros_like(rgb), "rgb_clear": torch.zeros_like(rgb), "rgb_clear_clamp": torch.zeros_like(rgb), "rgb_medium": medium_rgb, "pred_image": rgb,
+            return {"rgb": rgb, "depth": depth, "accumulation": accumulation, "background": medium_rgb,
+                    "rgb_object": torch.zeros_like(rgb), "rgb_clear": torch.zeros_like(rgb), "rgb_clear_clamp": torch.zeros_like(rgb),
+                    "rgb_clear_raw": torch.zeros_like(rgb), "rgb_medium": medium_rgb, "pred_image": rgb,
                     "medium_rgb": medium_rgb, "medium_bs": medium_bs, "medium_attn": medium_attn}
 
         if self.training:
@@ -893,9 +1158,11 @@ class WaterSplattingModel(Model):
             background=medium_rgb,
             return_alpha=True,
             step=self.step,
+            depth_grad_scale=self.config.medium_depth_grad_scale if self.training else 0.0,
         )  # type: ignore
         
         rgb = rgb_object + rgb_medium
+        rgb_clear_raw = rgb_clear  # unbounded restored radiance J (used by MDGR)
         rgb_clear_clamp = torch.clamp(rgb_clear, 0., 1.)
         rgb_clear = rgb_clear / (rgb_clear + 1.)
         
@@ -904,7 +1171,8 @@ class WaterSplattingModel(Model):
         depth_im = torch.where(alpha > 0, depth_im / alpha, depth_im.detach().max())  
                  
         return {"rgb": rgb, "depth": depth_im, "accumulation": alpha, "background": medium_rgb, 
-                "rgb_object": rgb_object, "rgb_clear": rgb_clear, "rgb_clear_clamp": rgb_clear_clamp, "rgb_medium": rgb_medium, "pred_image": rgb,
+                "rgb_object": rgb_object, "rgb_clear": rgb_clear, "rgb_clear_clamp": rgb_clear_clamp,
+                "rgb_clear_raw": rgb_clear_raw, "rgb_medium": rgb_medium, "pred_image": rgb,
                 "medium_rgb": medium_rgb, "medium_bs": medium_bs, "medium_attn": medium_attn}  # type: ignore
         
     def get_gt_img(self, image: torch.Tensor):
@@ -985,9 +1253,17 @@ class WaterSplattingModel(Model):
         else:
             simloss = 1 - self.ssim(gt_img.permute(2, 0, 1)[None, ...], pred_img.permute(2, 0, 1)[None, ...])
 
-        return {
+        loss_dict = {
             "main_loss": (1 - self.config.ssim_lambda) * recon_loss + self.config.ssim_lambda * simloss,
         }
+        if (
+            self.training
+            and self.config.pseudo_views
+            and len(self._pseudo_targets) > 0
+            and self._pseudo_rng.random() < self.config.pseudo_prob
+        ):
+            loss_dict["pseudo_loss"] = self.config.pseudo_loss_weight * self._pseudo_view_loss()
+        return loss_dict
 
     @torch.no_grad()
     def get_outputs_for_camera(self, camera: Cameras, obb_box: Optional[OrientedBox] = None) -> Dict[str, torch.Tensor]:

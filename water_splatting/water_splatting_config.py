@@ -1,3 +1,5 @@
+import copy
+
 from nerfstudio.engine.trainer import TrainerConfig
 from nerfstudio.plugins.types import MethodSpecification
 from nerfstudio.pipelines.base_pipeline import VanillaPipelineConfig
@@ -161,4 +163,14 @@ water_splatting_method_big = MethodSpecification(
         vis="viewer",
     ),
     description="Water-Splatting big for underwater scenes.",
+)
+# Medium-decoupled generative refinement (MDGR, novel-view pseudo-supervision), see water_splatting/pseudo_views.py.
+# Identical to `water-splatting` except that pseudo-views are enabled; every MDGR option can still be changed on the
+# command line, e.g. --pipeline.model.pseudo-fixer identity (ablation) or --pipeline.model.pseudo-fix-space underwater.
+_pseudo_config = copy.deepcopy(water_splatting_method.config)
+_pseudo_config.method_name = "water-splatting-pseudo"
+_pseudo_config.pipeline.model.pseudo_views = True
+water_splatting_pseudo_method = MethodSpecification(
+    config=_pseudo_config,
+    description="Water-Splatting + medium-decoupled generative refinement of pseudo novel views.",
 )
