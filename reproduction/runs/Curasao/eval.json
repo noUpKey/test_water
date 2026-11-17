@@ -1,0 +1,17 @@
+{
+  "experiment_name": "Curasao",
+  "method_name": "water-splatting",
+  "checkpoint": "/kaggle/working/ws/outputs/Curasao/water-splatting/seed42/nerfstudio_models/step-000014999.ckpt",
+  "results": {
+    "psnr": 31.955341339111328,
+    "psnr_std": 4.466543197631836,
+    "ssim": 0.9457603693008423,
+    "ssim_std": 0.01886638067662716,
+    "lpips": 0.12277986854314804,
+    "lpips_std": 0.05872863531112671,
+    "num_rays_per_sec": 385451.34375,
+    "num_rays_per_sec_std": 44080.9453125,
+    "fps": 0.18085508048534393,
+    "fps_std": 0.0206829272210598
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "experiment_name": "IUI3-RedSea",
+  "method_name": "water-splatting",
+  "checkpoint": "/kaggle/working/ws/outputs/IUI3-RedSea/water-splatting/seed42/nerfstudio_models/step-000014999.ckpt",
+  "results": {
+    "psnr": 29.163890838623047,
+    "psnr_std": 5.058644771575928,
+    "ssim": 0.8882656693458557,
+    "ssim_std": 0.03997381776571274,
+    "lpips": 0.20590297877788544,
+    "lpips_std": 0.0206129252910614,
+    "num_rays_per_sec": 495094.21875,
+    "num_rays_per_sec_std": 74521.1875,
+    "fps": 0.3903878927230835,
+    "fps_std": 0.0587608702480793
+  }
+}

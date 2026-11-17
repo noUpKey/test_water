@@ -1,0 +1,17 @@
+{
+  "experiment_name": "JapaneseGradens-RedSea",
+  "method_name": "water-splatting",
+  "checkpoint": "/kaggle/working/ws/outputs/JapaneseGradens-RedSea/water-splatting/seed42/nerfstudio_models/step-000014999.ckpt",
+  "results": {
+    "psnr": 24.639873504638672,
+    "psnr_std": 4.814367771148682,
+    "ssim": 0.8935346603393555,
+    "ssim_std": 0.09931452572345734,
+    "lpips": 0.1185126006603241,
+    "lpips_std": 0.057457346469163895,
+    "num_rays_per_sec": 401871.53125,
+    "num_rays_per_sec_std": 56537.66015625,
+    "fps": 0.3163067400455475,
+    "fps_std": 0.04449989274144173
+  }
+}

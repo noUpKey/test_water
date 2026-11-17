@@ -1,0 +1,17 @@
+{
+  "experiment_name": "Panama",
+  "method_name": "water-splatting",
+  "checkpoint": "/kaggle/working/ws/outputs/Panama/water-splatting/seed42/nerfstudio_models/step-000014999.ckpt",
+  "results": {
+    "psnr": 31.517152786254883,
+    "psnr_std": 0.8768242597579956,
+    "ssim": 0.9414547085762024,
+    "ssim_std": 0.011891399510204792,
+    "lpips": 0.07895462960004807,
+    "lpips_std": 0.01593640260398388,
+    "num_rays_per_sec": 357289.0,
+    "num_rays_per_sec_std": 18439.83984375,
+    "fps": 0.167547807097435,
+    "fps_std": 0.008647218346595764
+  }
+}

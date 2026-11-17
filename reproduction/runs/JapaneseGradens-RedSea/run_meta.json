@@ -1,0 +1,40 @@
+{
+  "scene": "JapaneseGradens-RedSea",
+  "seed": 42,
+  "gpu_index": 0,
+  "parallel_runs": 2,
+  "train_minutes": 32.28,
+  "gpu": "Tesla T4",
+  "command": "ns-train water-splatting --vis tensorboard --output-dir /kaggle/working/ws/outputs --experiment-name JapaneseGradens-RedSea --timestamp seed42 --machine.seed 42 colmap --downscale-factor 1 --colmap-path sparse --data '/tmp/ws_scratch/data_undistorted/JapaneseGradens-RedSea' --images-path images --eval-mode interval --eval-interval 8",
+  "water_splatting_commit": "0c2d94383438f8e948892e7aaeeed16577b3c2b6",
+  "split": {
+    "protocol": "SeaThru-NeRF/WaterSplatting: alphabetical order, every 8th image (i % 8 == 0) is test",
+    "n_total": 20,
+    "n_train": 17,
+    "n_test": 3,
+    "train": [
+      "MTN_1091.png",
+      "MTN_1092.png",
+      "MTN_1093.png",
+      "MTN_1094.png",
+      "MTN_1095.png",
+      "MTN_1096.png",
+      "MTN_1097.png",
+      "MTN_1099.png",
+      "MTN_1100.png",
+      "MTN_1101.png",
+      "MTN_1102.png",
+      "MTN_1103.png",
+      "MTN_1104.png",
+      "MTN_1105.png",
+      "MTN_1107.png",
+      "MTN_1108.png",
+      "MTN_1109.png"
+    ],
+    "test": [
+      "MTN_1090.png",
+      "MTN_1098.png",
+      "MTN_1106.png"
+    ]
+  }
+}

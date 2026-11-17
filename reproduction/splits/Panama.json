@@ -1,0 +1,28 @@
+{
+  "protocol": "SeaThru-NeRF/WaterSplatting: alphabetical order, every 8th image (i % 8 == 0) is test",
+  "n_total": 18,
+  "n_train": 15,
+  "n_test": 3,
+  "train": [
+    "MTN_1532.png",
+    "MTN_1533.png",
+    "MTN_1534.png",
+    "MTN_1535.png",
+    "MTN_1536.png",
+    "MTN_1537.png",
+    "MTN_1538.png",
+    "MTN_1540.png",
+    "MTN_1541.png",
+    "MTN_1542.png",
+    "MTN_1543.png",
+    "MTN_1544.png",
+    "MTN_1545.png",
+    "MTN_1546.png",
+    "MTN_1548.png"
+  ],
+  "test": [
+    "MTN_1529.png",
+    "MTN_1539.png",
+    "MTN_1547.png"
+  ]
+}
