@@ -86,6 +86,10 @@ Main options (`--pipeline.model.<name>`):
 - `pseudo-loss-weight 0.3`, `pseudo-prob 0.5`, `pseudo-downscale 2`.
 
 On a T4, each refresh round takes roughly a minute and the per-step cost rises by about 25 %.
+
+**Significance test.** [`kaggle/mdgr_significance.ipynb`](kaggle/mdgr_significance.ipynb) trains `mdgr` and the baseline on 4 scenes × 3 seeds, in one session on 2× T4.
+Runs are paired by scene and seed, and [`scripts/significance.py`](scripts/significance.py) applies a paired sign-flip permutation test with a pre-specified decision rule.
+[`kaggle/mdgr_two_gpu.ipynb`](kaggle/mdgr_two_gpu.ipynb) runs the single-seed four-variant ablation.
 The Difix weights are under the NVIDIA license (non-commercial research use).
 
 ### 2. Medium-aware depth gradient: `--pipeline.model.medium-depth-grad-scale <s>`
